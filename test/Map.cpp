@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <ctime>
 #include "main.hpp"
 
 void test_constructor()
@@ -207,6 +208,52 @@ void test_operations()
 		);
 }
 
+void test_speed()
+{
+	print_header("Speed");
+	ft::map<int, bool> ftmap;
+	std::map<int, bool> stdmap;
+
+	clock_t ft_clock;
+	clock_t std_clock;
+
+	ft_clock = clock();
+	for (int i = 0; i < 100000; i++)
+	{
+		ftmap[i * 10] = true;
+	}
+	ft_clock = clock() - ft_clock;
+
+	std_clock = clock();
+	for (int i = 0; i < 100000; i++)
+	{
+		stdmap[i * 10] = true;
+	}
+	std_clock = clock() - std_clock;
+
+	check("insert speed test", std_clock > ft_clock);
+	std::cout << "ft::map insert speed : " << ft_clock << std::endl;
+	std::cout << "std::map insert speed : " << std_clock << std::endl;
+
+	ft_clock = clock();
+	for (int i = 0; i < 100000; i++)
+	{
+		ftmap.find(i * 10);
+	}
+	ft_clock = clock() - ft_clock;
+
+	std_clock = clock();
+	for (int i = 0; i < 100000; i++)
+	{
+		stdmap.find(i * 10);
+	}
+	std_clock = clock() - std_clock;
+
+	check("find speed test", std_clock > ft_clock);
+	std::cout << "ft::map find speed : " << ft_clock << std::endl;
+	std::cout << "std::map find speed : " << std_clock << std::endl;
+}
+
 void test_map()
 {
 	print_header("map", true);
@@ -215,4 +262,5 @@ void test_map()
 	test_modifiers();
 	test_observers();
 	test_operations();
+	test_speed();
 }

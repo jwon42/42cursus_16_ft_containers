@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/26 15:49:46 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 03:36:08 by jwon             ###   ########.fr       */
+/*   Updated: 2021/09/04 03:56:00 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,10 +234,10 @@ namespace ft
 
 			void swap(map& x)
 			{
-				swap(m_root, x.m_root);
-				swap(m_size, x.m_size);
-				swap(m_compare, x.m_compare);
-				swap(m_alloc, x.m_alloc);
+				std::swap(m_root, x.m_root);
+				std::swap(m_size, x.m_size);
+				std::swap(m_compare, x.m_compare);
+				std::swap(m_alloc, x.m_alloc);
 			}
 
 			void clear()
@@ -354,14 +354,6 @@ namespace ft
 			}
 
 		private:
-			template<class X>
-			void swap(X& x1, X& x2)
-			{
-				X tmp = x2;
-				x2 = x1;
-				x1 = tmp;
-			}
-
 			int		get_height(node_pointer node) const
 			{
 				if (node != NULL)
@@ -488,7 +480,7 @@ namespace ft
 					{
 						node_pointer tmp = node->left ? node->left : node->right;
 						if (tmp == NULL)
-							swap(tmp, node);
+							std::swap(tmp, node);
 						else
 						{
 							m_alloc.destroy(&node->val);

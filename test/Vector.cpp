@@ -1,3 +1,4 @@
+#include <ctime>
 #include "main.hpp"
 
 static void default_constructor(void)
@@ -200,6 +201,34 @@ static void operators(void)
 	check("v1 <= v2", (v1 <= v3), (v2 <= v4));
 }
 
+void testspeed()
+{
+	print_header("Speed");
+	ft::vector<int> ftvector;
+	std::vector<int> stdvector;
+
+	clock_t ft_clock;
+	clock_t std_clock;
+
+	ft_clock = clock();
+	for (int i = 0; i < 100000; i++)
+	{
+		ftvector.push_back(i * 10);
+	}
+	ft_clock = clock() - ft_clock;
+
+	std_clock = clock();
+	for (int i = 0; i < 100000; i++)
+	{
+		stdvector.push_back(i * 10);
+	}
+	std_clock = clock() - std_clock;
+
+	check("push_back speed test", std_clock > ft_clock);
+	std::cout << "ft::vector push_back speed : " << ft_clock << std::endl;
+	std::cout << "std::vector push_back speed : " << std_clock << std::endl;
+}
+
 void test_vector(void)
 {
 	print_header("vector", true);
@@ -215,4 +244,5 @@ void test_vector(void)
 	erase();
 	swap();
 	operators();
+	testspeed();
 }
