@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/26 15:49:46 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 03:56:00 by jwon             ###   ########.fr       */
+/*   Updated: 2021/09/04 04:41:26 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,65 +354,70 @@ namespace ft
 			}
 
 		private:
-			int		get_height(node_pointer node) const
+			int	 get_height(node_pointer node) const
 			{
 				if (node != NULL)
 					return (node->height);
 				return (0);
 			}
 
-			int		get_balance(node_pointer node) const
+			int	 get_balance(node_pointer node) const
 			{
 				if (node == NULL)
 					return (0);
 				return (get_height(node->left) - get_height(node->right));
 			}
 
-			node_pointer	left_rotate(node_pointer node)
+			void set_balance(node_pointer node)
+			{
+				node->height = std::max(get_height(node->left), get_height(node->right)) + 1;
+			}
+
+			node_pointer left_rotate(node_pointer node)
 			{
 				node_pointer	new_parent;
 
-				new_parent = node->right;				// new_parent = Q;
-				new_parent->parent = node->parent;		// Q->parent = P->parent;
-				node->parent = new_parent;				// P->parent = Q;
-				node->right = new_parent->left;			// P->right = B;
-				if (new_parent->left)					// if (Q->left)
-					new_parent->left->parent = node;	//	   B->parent = P;
-				new_parent->left = node;				// Q->left = P;
-				node->height = 1 + std::max(get_height(node->left), get_height(node->right));
-				new_parent->height = 1 + std::max(get_height(new_parent->left), get_height(new_parent->right));
+				new_parent = node->right;
+				new_parent->parent = node->parent;
+				node->parent = new_parent;
+				node->right = new_parent->left;
+				if (new_parent->left)
+					new_parent->left->parent = node;
+				new_parent->left = node;
+				set_balance(node);
+				set_balance(new_parent);
 				return (new_parent);
 			}
 
-			node_pointer	right_rotate(node_pointer node)
+			node_pointer right_rotate(node_pointer node)
 			{
 				node_pointer	new_parent;
 
-				new_parent = node->left;				// new_parent = P;
-				new_parent->parent = node->parent;		// P->parent = Q->parent;
-				node->parent = new_parent;				// Q->parent = P;
-				node->left = new_parent->right;			// Q->left = B;
-				if (new_parent->right)					// if (P->right)
-					new_parent->right->parent = node;	//     B->parent = Q;
-				new_parent->right = node;				// P->right = Q;
-				node->height = 1 + std::max(get_height(node->left), get_height(node->right));
-				new_parent->height = 1 + std::max(get_height(new_parent->left), get_height(new_parent->right));
+				new_parent = node->left;
+				new_parent->parent = node->parent;
+				node->parent = new_parent;
+				node->left = new_parent->right;
+				if (new_parent->right)
+					new_parent->right->parent = node;
+				new_parent->right = node;
+				set_balance(node);
+				set_balance(new_parent);
 				return (new_parent);
 			}
 
-			node_pointer	left_right_rotate(node_pointer node)
+			node_pointer left_right_rotate(node_pointer node)
 			{
 				node->left = this->left_rotate(node->left);
 				return (this->right_rotate(node));
 			}
 
-			node_pointer	right_left_rotate(node_pointer node)
+			node_pointer right_left_rotate(node_pointer node)
 			{
 				node->right = this->right_rotate(node->right);
 				return (this->left_rotate(node));
 			}
 
-			node_pointer	balance_tree(node_pointer node)
+			node_pointer balance_tree(node_pointer node)
 			{
 				int	factor = get_balance(node);
 				if (factor == 2)
@@ -432,7 +437,7 @@ namespace ft
 				return (node);
 			}
 
-			node_pointer	create_node(const value_type& val, node_pointer parent)
+			node_pointer create_node(const value_type& val, node_pointer parent)
 			{
 				node_pointer	new_node = node_allocator(m_alloc).allocate(1);
 
@@ -448,7 +453,7 @@ namespace ft
 				return (new_node);
 			}
 
-			node_pointer	insert_node(node_pointer node, node_pointer parent, const value_type& val)
+			node_pointer insert_node(node_pointer node, node_pointer parent, const value_type& val)
 			{
 				if (node == NULL)
 					return (create_node(val, parent));
@@ -465,7 +470,7 @@ namespace ft
 				return(balance_tree(node));
 			}
 
-			node_pointer	delete_node(node_pointer node, const key_type& key)
+			node_pointer delete_node(node_pointer node, const key_type& key)
 			{
 				if (node == NULL)
 					return (NULL);
@@ -504,7 +509,7 @@ namespace ft
 				return(balance_tree(node));
 			}
 
-			node_pointer	clear_tree(node_pointer node)
+			node_pointer clear_tree(node_pointer node)
 			{
 				if (!node)
 					return (NULL);
@@ -518,7 +523,7 @@ namespace ft
 				return (NULL);
 			}
 
-			node_pointer	search_tree(node_pointer node, const key_type& key) const
+			node_pointer search_tree(node_pointer node, const key_type& key) const
 			{
 				if (node == NULL)
 					return (NULL);
@@ -531,14 +536,14 @@ namespace ft
 				return (NULL);
 			}
 
-			node_pointer	min_node(node_pointer node) const
+			node_pointer min_node(node_pointer node) const
 			{
 				while (node && node->left != NULL)
 					node = node->left;
 				return (node);
 			}
 
-			node_pointer	max_node(node_pointer node) const
+			node_pointer max_node(node_pointer node) const
 			{
 				while (node && node->right != NULL)
 					node = node->right;
