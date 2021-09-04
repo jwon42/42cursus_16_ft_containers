@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:31:07 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/03 16:31:13 by jwon             ###   ########.fr       */
+/*   Updated: 2021/09/04 13:44:39 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,11 @@ namespace ft
 	template<class T1, class T2>
 	struct pair
 	{
-			typedef T1		first_type;
-			typedef T2		second_type;
+			typedef T1 first_type;
+			typedef T2 second_type;
 
-			first_type		first;
-			second_type		second;
+			first_type first;
+			second_type second;
 
 			pair() : first(first_type()), second(second_type()) {}
 			pair(const first_type& x, const second_type& y)
