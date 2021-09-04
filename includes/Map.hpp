@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/26 15:49:46 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 04:41:26 by jwon             ###   ########.fr       */
+/*   Updated: 2021/09/04 14:28:00 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ namespace ft
 			typedef Compare key_compare; // map의 두 요소간 상대적 순서를 결정하는 두 정렬 키를 비교할 수 있는 함수 개체에 대한 typedef
 			typedef Alloc allocator_type; // map 개체를 위한 allocator 클래스를 나타내는 형식
 
-			typedef Node* node_pointer; // node 포인터를 나타내는 형식
-			typedef typename Alloc::template rebind<Node>::other node_allocator; // node 할당자를 나타내는 형식
+			typedef Node* node_ptr; // node 포인터를 나타내는 형식
+			typedef typename Alloc::template rebind<Node>::other node_alloc; // node 할당자를 나타내는 형식
 
 			typedef typename allocator_type::reference reference; // map에 저장된 요소에 대한 참조를 제공하는 형식
 			typedef typename allocator_type::const_reference const_reference; // 위와 동일, 하지만 요소의 변경을 원하지 않는 경우 사용
@@ -58,8 +58,8 @@ namespace ft
 			typedef size_t size_type; // map의 요소 수를 계산하는 형식
 
 		private:
-			node_pointer m_root;
-			node_pointer m_last_inserted_node;
+			node_ptr m_root;
+			node_ptr m_last_inserted_node;
 			size_type m_size;
 			key_compare m_compare;
 			allocator_type m_alloc;
@@ -108,7 +108,7 @@ namespace ft
 			}
 
 			// iterators
-			iterator begin()
+			iterator begin() // map의 첫번째 요소를 가리키는 iterator 반환
 			{
 				return (iterator(this->min_node(m_root)));
 			}
@@ -118,7 +118,7 @@ namespace ft
 				return (const_iterator(this->min_node(m_root)));
 			}
 
-			iterator end()
+			iterator end() // map의 마지막 요소를 가리키는 iterator 반환
 			{
 				if (this->empty())
 					return (iterator());
@@ -134,7 +134,7 @@ namespace ft
 					this->max_node(m_root)));
 			}
 
-			reverse_iterator rbegin()
+			reverse_iterator rbegin() // map의 첫번째 요소를 가리키는 reverse_iterator 반환
 			{
 				return (reverse_iterator(this->max_node(m_root)));
 			}
@@ -144,7 +144,7 @@ namespace ft
 				return (const_reverse_iterator(this->max_node(m_root)));
 			}
 
-			reverse_iterator rend()
+			reverse_iterator rend() // map의 마지막 요소를 가리키는 reverse_iterator 반환
 			{
 				if (this->empty())
 					return (reverse_iterator(m_root));
@@ -161,38 +161,38 @@ namespace ft
 			}
 
 			// capacity
-			bool empty() const
+			bool empty() const // map 비어있는지 여부 체크
 			{
 				return (m_size == 0);
 			}
 
-			size_type size() const
+			size_type size() const // map에 있는 요소 수를 반환
 			{
 				return (m_size);
 			}
 
-			size_type max_size() const
+			size_type max_size() const // map의 최대 길이를 반환
 			{
-				return (node_allocator(m_alloc).max_size());
+				return (node_alloc(m_alloc).max_size());
 			}
 
 			// element access operator
-			mapped_type& operator[](const key_type& k)
+			mapped_type& operator[](const key_type& k) // map에 지정된 위치의 요소에 대한 참조를 반환
 			{
 				m_root = this->insert_node(m_root, NULL, ft::make_pair(k, mapped_type()));
 
-				node_pointer element = m_last_inserted_node;
+				node_ptr element = m_last_inserted_node;
 				m_last_inserted_node = NULL;
 				return (element->val.second);
 			}
 
 			// modifiers
-			pair<iterator,bool> insert(const value_type& val)
+			pair<iterator,bool> insert(const value_type& val) // pair 구조의 요소를 map에 삽입
 			{
 				size_type prev_size = this->size();
 
 				m_root = this->insert_node(m_root, NULL, val);
-				node_pointer newnode = m_last_inserted_node;
+				node_ptr newnode = m_last_inserted_node;
 				m_last_inserted_node = NULL;
 				return (ft::pair<iterator, bool>(iterator(newnode),
 					(this->size() > prev_size)));
@@ -212,7 +212,7 @@ namespace ft
 					this->insert(*first++);
 			}
 
-			void erase(iterator position)
+			void erase(iterator position) // map에서 position의 요소를 삭제
 			{
 				m_root = this->delete_node(m_root, position->first);
 			}
@@ -225,14 +225,14 @@ namespace ft
 				return ((this->size() == prev_size) ? 0 : 1);
 			}
 
-			void erase(iterator first, iterator last)
+			void erase(iterator first, iterator last) // map에서 first부터 last까지 요소를 삭제
 			{
 				map tmp(first, last);
 				for (reverse_iterator it = tmp.rbegin(); it != tmp.rend(); ++it)
 					this->erase(it->first);
 			}
 
-			void swap(map& x)
+			void swap(map& x) // 동일한 유형의 다른 map의 요소를 이 map의 요소로 교체
 			{
 				std::swap(m_root, x.m_root);
 				std::swap(m_size, x.m_size);
@@ -240,35 +240,33 @@ namespace ft
 				std::swap(m_alloc, x.m_alloc);
 			}
 
-			void clear()
+			void clear() // map의 모든 요소를 삭제
 			{
 				m_root = this->clear_tree(m_root);
 				m_size = 0;
 			}
 
 			// observer
-			key_compare key_comp() const
+			key_compare key_comp() const // key 정렬을 위해 비교 개체의 복사본을 검색
 			{
 				return (m_compare);
 			}
 
 			class value_compare
 			{
-				// in C++98, it is required to inherit binary_function<value_type,value_type,bool>
-				friend class map;
 				public:
 					typedef bool result_type;
 					typedef value_type first_argument_type;
 					typedef value_type second_argument_type;
+					value_compare(Compare c) : comp(c) {}
 
-				bool operator()(const value_type &x, const value_type &y) const
-				{
-					return comp(x.first, y.first);
-				}
+					bool operator()(const value_type &x, const value_type &y) const
+					{
+						return comp(x.first, y.first);
+					}
 
 				protected:
 					key_compare comp;
-					value_compare(Compare c) : comp(c) {}
 			};
 
 			value_compare value_comp() const
@@ -277,7 +275,7 @@ namespace ft
 			}
 
 			// operations
-			iterator find(const key_type& k)
+			iterator find(const key_type& k) // 지정된 키와 같은 키를 가진 map 요소의 iterator를 반환
 			{
 				return (search_tree(m_root, k) ? iterator(search_tree(m_root, k)) : end());
 			}
@@ -287,12 +285,12 @@ namespace ft
 				return (search_tree(m_root, k) ? const_iterator(search_tree(m_root, k)) : end());
 			}
 
-			size_type count(const key_type& k) const
+			size_type count(const key_type& k) const // 지정된 키와 일치하는 map의 요소를 반환 (multimap이 아니므로 0 아니면 1)
 			{
 				return (search_tree(m_root, k) ? 1 : 0);
 			}
 
-			iterator lower_bound(const key_type& k)
+			iterator lower_bound(const key_type& k) // 지정된 키보다 크거나 같은 키 값을 가진 첫번째 요소의 iterator를 반환
 			{
 				iterator lower = this->begin();
 				iterator end = this->end();
@@ -310,7 +308,7 @@ namespace ft
 				return (lower);
 			}
 
-			iterator upper_bound(const key_type& k)
+			iterator upper_bound(const key_type& k) // 지정된 키보다 큰 값을 가진 첫번째 요소에 대한 iterator를 반환
 			{
 				iterator upper = this->begin();
 				iterator end = this->end();
@@ -328,7 +326,7 @@ namespace ft
 				return (upper);
 			}
 
-			pair<const_iterator,const_iterator> equal_range(const key_type& k) const
+			pair<const_iterator,const_iterator> equal_range(const key_type& k) const // 지정된 키가 있는 모든 요소를 포함하는 범위의 경계를 반환
 			{
 				pair<const_iterator, const_iterator> range;
 
@@ -348,36 +346,35 @@ namespace ft
 
 
 			// allocator
-			allocator_type get_allocator() const
+			allocator_type get_allocator() const // map 생성에 필요한 할당자의 복사본을 반환
 			{
 				return (m_alloc);
 			}
 
 		private:
-			int	 get_height(node_pointer node) const
+			int get_height(node_ptr node) const
 			{
 				if (node != NULL)
 					return (node->height);
 				return (0);
 			}
 
-			int	 get_balance(node_pointer node) const
+			int get_balance(node_ptr node) const
 			{
 				if (node == NULL)
 					return (0);
 				return (get_height(node->left) - get_height(node->right));
 			}
 
-			void set_balance(node_pointer node)
+			void set_balance(node_ptr node) // 노드의 균형(높이) 계산
 			{
 				node->height = std::max(get_height(node->left), get_height(node->right)) + 1;
 			}
 
-			node_pointer left_rotate(node_pointer node)
+			node_ptr left_rotate(node_ptr node)
 			{
-				node_pointer	new_parent;
+				node_ptr	new_parent = node->right;
 
-				new_parent = node->right;
 				new_parent->parent = node->parent;
 				node->parent = new_parent;
 				node->right = new_parent->left;
@@ -389,11 +386,10 @@ namespace ft
 				return (new_parent);
 			}
 
-			node_pointer right_rotate(node_pointer node)
+			node_ptr right_rotate(node_ptr node)
 			{
-				node_pointer	new_parent;
+				node_ptr	new_parent = node->left;
 
-				new_parent = node->left;
 				new_parent->parent = node->parent;
 				node->parent = new_parent;
 				node->left = new_parent->right;
@@ -405,19 +401,19 @@ namespace ft
 				return (new_parent);
 			}
 
-			node_pointer left_right_rotate(node_pointer node)
+			node_ptr left_right_rotate(node_ptr node)
 			{
 				node->left = this->left_rotate(node->left);
 				return (this->right_rotate(node));
 			}
 
-			node_pointer right_left_rotate(node_pointer node)
+			node_ptr right_left_rotate(node_ptr node)
 			{
 				node->right = this->right_rotate(node->right);
 				return (this->left_rotate(node));
 			}
 
-			node_pointer balance_tree(node_pointer node)
+			node_ptr balance_tree(node_ptr node)
 			{
 				int	factor = get_balance(node);
 				if (factor == 2)
@@ -437,9 +433,9 @@ namespace ft
 				return (node);
 			}
 
-			node_pointer create_node(const value_type& val, node_pointer parent)
+			node_ptr create_node(const value_type& val, node_ptr parent)
 			{
-				node_pointer	new_node = node_allocator(m_alloc).allocate(1);
+				node_ptr	new_node = node_alloc(m_alloc).allocate(1);
 
 				new_node->left = NULL;
 				new_node->right = NULL;
@@ -453,7 +449,7 @@ namespace ft
 				return (new_node);
 			}
 
-			node_pointer insert_node(node_pointer node, node_pointer parent, const value_type& val)
+			node_ptr insert_node(node_ptr node, node_ptr parent, const value_type& val)
 			{
 				if (node == NULL)
 					return (create_node(val, parent));
@@ -470,7 +466,7 @@ namespace ft
 				return(balance_tree(node));
 			}
 
-			node_pointer delete_node(node_pointer node, const key_type& key)
+			node_ptr delete_node(node_ptr node, const key_type& key)
 			{
 				if (node == NULL)
 					return (NULL);
@@ -483,7 +479,7 @@ namespace ft
 				{
 					if ((node->left == NULL) || (node->right == NULL))
 					{
-						node_pointer tmp = node->left ? node->left : node->right;
+						node_ptr tmp = node->left ? node->left : node->right;
 						if (tmp == NULL)
 							std::swap(tmp, node);
 						else
@@ -494,12 +490,12 @@ namespace ft
 							node->right = NULL;
 						}
 						m_alloc.destroy(&tmp->val);
-						node_allocator(m_alloc).deallocate(tmp, 1);
+						node_alloc(m_alloc).deallocate(tmp, 1);
 						this->m_size--;
 					}
 					else
 					{
-						node_pointer tmp = this->min_node(node->right);
+						node_ptr tmp = this->min_node(node->right);
 						m_alloc.destroy(&node->val);
 						m_alloc.construct(&node->val, tmp->val);
 						node->right = delete_node(node->right, tmp->val.first);
@@ -509,7 +505,7 @@ namespace ft
 				return(balance_tree(node));
 			}
 
-			node_pointer clear_tree(node_pointer node)
+			node_ptr clear_tree(node_ptr node)
 			{
 				if (!node)
 					return (NULL);
@@ -518,12 +514,12 @@ namespace ft
 				if (node->right)
 					clear_tree(node->right);
 				m_alloc.destroy(&node->val);
-				node_allocator(m_alloc).deallocate(node, 1);
+				node_alloc(m_alloc).deallocate(node, 1);
 				m_size--;
 				return (NULL);
 			}
 
-			node_pointer search_tree(node_pointer node, const key_type& key) const
+			node_ptr search_tree(node_ptr node, const key_type& key) const
 			{
 				if (node == NULL)
 					return (NULL);
@@ -536,14 +532,14 @@ namespace ft
 				return (NULL);
 			}
 
-			node_pointer min_node(node_pointer node) const
+			node_ptr min_node(node_ptr node) const
 			{
 				while (node && node->left != NULL)
 					node = node->left;
 				return (node);
 			}
 
-			node_pointer max_node(node_pointer node) const
+			node_ptr max_node(node_ptr node) const
 			{
 				while (node && node->right != NULL)
 					node = node->right;
