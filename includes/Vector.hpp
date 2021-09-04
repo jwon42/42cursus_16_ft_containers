@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/17 14:47:02 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 03:36:12 by jwon             ###   ########.fr       */
+/*   Updated: 2021/09/04 14:28:01 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -418,7 +418,8 @@ namespace ft
 			}
 	};
 
-		// overload
+		// non-member function overloads
+		// relational operators start
 		template <class T, class Alloc>
 		bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
@@ -436,8 +437,7 @@ namespace ft
 		template <class T, class Alloc>
 		bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
-			return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
-				rhs.begin(), rhs.end()));
+			return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 		}
 
 		template <class T, class Alloc>
@@ -457,6 +457,7 @@ namespace ft
 		{
 			return !(lhs < rhs);
 		}
+		// relational operators end
 
 		template <class T, class Alloc>
 		void swap(vector<T,Alloc>& x, vector<T,Alloc>& y)
