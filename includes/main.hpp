@@ -1,19 +1,7 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.hpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/08/16 15:53:06 by yechoi            #+#    #+#             */
-/*   Updated: 2021/09/04 00:36:08 by jwon             ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#ifndef MAIN_HPP
+# define MAIN_HPP
 
-#ifndef TEST_HPP
-#define TEST_HPP
-
-#include <iostream>
+# include <iostream>
 
 # include <vector>
 # include <list>

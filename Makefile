@@ -6,7 +6,7 @@
 #    By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/02 20:18:35 by jwon              #+#    #+#              #
-#    Updated: 2021/09/04 03:40:21 by jwon             ###   ########.fr        #
+#    Updated: 2021/10/12 16:38:29 by jwon             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ HEADER = -I ./includes
 
 CC		= clang++
 
-FLAGS	= -std=c++98 -Wall -Wextra -Werror
+FLAGS	= -std=c++98 -Wall -Wextra -Werror -fsanitize=address -g3
 
 $(NAME):
 	$(CC) $(FLAGS) $(SRCS) -o $(NAME) $(HEADER)
