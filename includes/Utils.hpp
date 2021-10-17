@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:31:07 by jwon              #+#    #+#             */
-/*   Updated: 2021/10/12 16:41:34 by jwon             ###   ########.fr       */
+/*   Updated: 2021/10/15 00:45:30 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 namespace ft
 {
+	// B가 true이면 ft::enable_if::type이 생성
+	// https://stackoverflow.com/questions/62012761/what-is-the-meaning-of-type-nullptr
 	template <bool B, typename T = void>
 	struct enable_if {};
 
@@ -23,6 +25,62 @@ namespace ft
 	{
 		typedef T type;
 	};
+
+	// integral type에는 bool, char, char16_t, char32_t, wchar_t, signed char,
+	// short int, int, long ing, long long int, unsigned char, unsigned short int,
+	// unsigned int, unsigned long int, unsigned long long int 가 있다.
+
+    // 위의 integral type일 경우에만 value가 true로 세팅
+    template <bool is_integral, typename T>
+    struct is_integral_res
+    {
+        typedef T type;
+        static const bool value = is_integral;
+    };
+
+    // integral type에 해당하지 않는 자료형은 false로 세팅
+    template<typename>
+    struct is_integral_type : public is_integral_res<false, bool> {};
+
+    // integral type에 해당하는 자료형들은 true로 세팅
+    template<>
+    struct is_integral_type<bool>: public is_integral_res<true, bool> {};
+
+    template<>
+    struct is_integral_type<char>: public is_integral_res<true, char> {};
+
+    template<>
+    struct is_integral_type<signed char>: public is_integral_res<true, signed char> {};
+
+    template<>
+    struct is_integral_type<short int>: public is_integral_res<true, short int> {};
+
+    template<>
+    struct is_integral_type<int>: public is_integral_res<true, int> {};
+
+    template<>
+    struct is_integral_type<long int>: public is_integral_res<true, long int> {};
+
+    template<>
+    struct is_integral_type<long long int>: public is_integral_res<true, long long int> {};
+
+    template<>
+    struct is_integral_type<unsigned char>: public is_integral_res<true, unsigned char> {};
+
+    template<>
+    struct is_integral_type<unsigned short int>: public is_integral_res<true, unsigned short int> {};
+
+    template<>
+    struct is_integral_type<unsigned int>: public is_integral_res<true, unsigned int> {};
+
+    template<>
+    struct is_integral_type<unsigned long int>: public is_integral_res<true, unsigned long int> {};
+
+    template<>
+    struct is_integral_type<unsigned long long int>: public is_integral_res<true, unsigned long long int> {};
+
+    template <class T>
+    struct is_integral : public is_integral_type<T> {};
 
 // bool equal
 // begin1 ~ end1 사이의 구간과 begin2 이후의 구간에 있는 요소들을 1:1로 비교한다.
@@ -52,6 +110,22 @@ namespace ft
 		while (begin1 != end1)
 		{
 			if (begin2 == end2 || *begin2 < *begin1)
+				return (false);
+			else if (*begin1 < *begin2)
+				return (true);
+			begin1++;
+			begin2++;
+		}
+		return (begin2 != end2);
+	}
+
+	template <class InputIterator1, class InputIterator2, class Compare>
+	static bool	lexicographical_compare(InputIterator1 begin1, InputIterator1 end1,
+		InputIterator2 begin2, InputIterator2 end2, Compare comp)
+	{
+		while (begin1 != end1)
+		{
+			if (begin2 == end2 || comp(*begin2, *begin1))
 				return (false);
 			else if (*begin1 < *begin2)
 				return (true);

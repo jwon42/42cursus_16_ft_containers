@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/17 14:47:02 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 14:28:01 by jwon             ###   ########.fr       */
+/*   Updated: 2021/10/16 20:59:39 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 # define VECTOR_HPP
 
 # include "Utils.hpp"
-# include "VectorIterator.hpp"
-# include "Iterator.hpp"
+# include "iterator/VectorIterator.hpp"
+# include "iterator/IteratorUtils.hpp"
 
 // std::vector reference
 // https://www.cplusplus.com/reference/vector/vector/
 
 namespace ft
 {
-	template <class T, class Alloc = std::allocator<T> >
+	template < class T, class Alloc = std::allocator<T> >
 	class vector
 	{
 		public:
@@ -34,10 +34,10 @@ namespace ft
 			typedef typename allocator_type::pointer pointer; // vector에 저장된 요소에 대한 포인터를 제공하는 형식
 			typedef typename allocator_type::const_pointer const_pointer; // 위와 동일, 하지만 요소의 변경을 원하지 않는 경우 사용
 
-			typedef vector_iterator<T> iterator; // vector에 있는 모든 요소를 읽거나 수정할 수 있는 반복자를 제공하는 형식
-			typedef const_vector_iterator<T> const_iterator; // 위와 동일, 하지만 요소의 변경을 원하지 않는 경우 사용
-			typedef reverse_vector_iterator<T> reverse_iterator; // vector에 있는 모든 요소를 읽거나 수정할 수 있는 역반복자를 제공하는 형식
-			typedef const_reverse_vector_iterator<T> const_reverse_iterator; // 위와 동일, 하지만 요소의 변경을 원하지 않는 경우 사용
+			typedef ft::vector_iterator<T> iterator; // vector에 있는 모든 요소를 읽거나 수정할 수 있는 반복자를 제공하는 형식
+			typedef ft::const_vector_iterator<T> const_iterator; // 위와 동일, 하지만 요소의 변경을 원하지 않는 경우 사용
+			typedef ft::reverse_vector_iterator<T> reverse_iterator; // vector에 있는 모든 요소를 읽거나 수정할 수 있는 역반복자를 제공하는 형식
+			typedef ft::const_reverse_vector_iterator<T> const_reverse_iterator; // 위와 동일, 하지만 요소의 변경을 원하지 않는 경우 사용
 
 			typedef ptrdiff_t difference_type; // vector 개체 내에서 두 요소 주소의 차이를 제공하는 형식
 			typedef size_t size_type; // vector의 요소 수를 계산하는 형식
@@ -51,14 +51,17 @@ namespace ft
 		public:
 		  // default constructor (1)
 			// 요소 없는 빈 vector 생성
-			explicit vector(const allocator_type& alloc = allocator_type()) : m_size(0), m_capacity(1), m_alloc(alloc)
+			explicit vector(const allocator_type& alloc = allocator_type())
+				: m_size(0), m_capacity(1), m_alloc(alloc)
 			{
 				m_head = m_alloc.allocate(1);
 			}
 
 			// constructor overloading (2)
 			// vector의 초기 크기(n)지정, T 타입의 초기 값을 지정
-			explicit vector(size_type n, const value_type& val = value_type(),
+			explicit vector(
+				size_type n,
+				const value_type& val = value_type(),
 				const allocator_type& alloc = allocator_type())
 				: m_size(n), m_capacity(n), m_alloc(alloc)
 			{
@@ -70,9 +73,11 @@ namespace ft
 			// constructor overloading (3)
 			// iterator가 지정한 구간(first~last)의 요소를 복사하여 vector 생성
 			template <class InputIterator>
-			vector(typename ft::enable_if<!std::numeric_limits<InputIterator>
-				::is_integer, InputIterator>::type first, InputIterator last,
-				const allocator_type& alloc = allocator_type())
+			vector(
+				InputIterator first,
+				InputIterator last,
+				const allocator_type& alloc = allocator_type(),
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
 			: m_size(0), m_capacity(0), m_alloc(alloc)
 			{
 				this->assign(first, last);
@@ -80,8 +85,8 @@ namespace ft
 
 			// constructor overloading (4)
 			// 복사생성자, vector x의 요소를 그대로 복사
-			vector(const vector& x) : m_size(x.m_size), m_capacity(x.m_size),
-				m_alloc(x.m_alloc)
+			vector(const vector& x)
+			: m_size(x.m_size), m_capacity(x.m_size), m_alloc(x.m_alloc)
 			{
 				m_head = m_alloc.allocate(m_capacity);
 				for (size_type i = 0; i < m_capacity; i++)
@@ -103,7 +108,6 @@ namespace ft
 				m_size = x.m_size;
 				if (m_capacity)
 					m_alloc.deallocate(m_head, m_capacity);
-
 				m_head = m_alloc.allocate(m_size);
 				for (size_type i = 0; i < m_size; i++)
 					m_alloc.construct(&m_head[i], x.m_head[i]);
@@ -176,7 +180,7 @@ namespace ft
 
 			size_type capacity() const // vector가 현재 상태에서 포함할 수 있는 최대 요소 수를 반환
 			{
-				return (m_capacity - m_head);
+				return (m_capacity);
 			}
 
 			bool empty() const // vector가 비어있는 상태인지 확인
@@ -239,8 +243,8 @@ namespace ft
 
 			// modifiers
 			template <class InputIterator>
-			void assign(typename ft::enable_if<!std::numeric_limits<InputIterator>
-				::is_integer, InputIterator>::type first, InputIterator last) // vector의 요소를 모두 삭제하고 first부터 last까지의 요소를 빈 벡터에 복사
+			void assign(InputIterator first, InputIterator last,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0) // vector의 요소를 모두 삭제하고 first부터 last까지의 요소를 빈 벡터에 복사
 			{
 				difference_type n = 0;
 
@@ -250,7 +254,6 @@ namespace ft
 					++tmp;
 					++n;
 				}
-
 				this->clear();
 				this->reserve(n);
 				while (first != last)
@@ -285,7 +288,6 @@ namespace ft
 				difference_type shift = (position - this->begin());
 				if (m_size + 1 > m_capacity)
 					reallocate(extend(m_size + 1));
-
 				this->insert(iterator(this->begin() + shift), 1, val);
 				return (iterator(this->begin() + shift));
 			}
@@ -294,10 +296,8 @@ namespace ft
 			{
 				if (n == 0)
 					return;
-
 				difference_type shift = position - this->begin();
 				difference_type tmp = this->end() - this->begin();
-
 				this->resize(this->m_size + n);
 				iterator end = this->end();
 				position = this->begin() + shift;
@@ -313,9 +313,8 @@ namespace ft
 			}
 
 			template <class InputIterator>
-			void insert(iterator position, typename ft::enable_if
-				<!std::numeric_limits<InputIterator>::is_integer, InputIterator>
-				::type first, InputIterator last) // vector의 position에 first부터 last까지 삽입
+			void insert(iterator position, InputIterator first, InputIterator last,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0) // vector의 position에 first부터 last까지 삽입
 			{
 				difference_type shift = (position - this->begin());
 				size_type n = 0;
@@ -326,13 +325,11 @@ namespace ft
 					++tmp;
 					++n;
 				}
-
 				if (m_size == 0)
 					reallocate(m_size + n);
 				if ((m_size + n) > m_capacity)
 					reallocate((m_size + n > m_size * 2) ? m_size + n : m_size * 2);
 				m_size += n;
-
 				iterator it(&m_head[m_size - n]);
 				iterator insert_pos(&m_head[shift]);
 				iterator it_end = this->end();
@@ -354,7 +351,6 @@ namespace ft
 
 				size_type n = last - first;
 				iterator ret(first);
-
 				while (last != this->end())
 					*(first++) = *(last++);
 				while (n--)

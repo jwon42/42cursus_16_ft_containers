@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/15 14:15:05 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 03:39:06 by jwon             ###   ########.fr       */
+/*   Updated: 2021/10/14 20:50:18 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@
 # include <memory>
 
 namespace ft {
-  // iterator tags
-  struct input_iterator_tag {};
-  struct output_iterator_tag : public input_iterator_tag {};
-  struct forward_iterator_tag : public output_iterator_tag {};
-  struct bidirectional_iterator_tag : public forward_iterator_tag {};
-  struct random_access_iterator_tag : public bidirectional_iterator_tag {};
+  // iterator tags // 반복자 종류
+  struct input_iterator_tag {}; // 전진만 가능, 한에 하나만 읽기 가능
+  struct output_iterator_tag {}; // 전진만 가능, 한번에 하나만 쓰기 가능
+  struct forward_iterator_tag : public input_iterator_tag, output_iterator_tag {}; // 전진만 가능, 한번에 여러개 읽고 쓰기 가능
+  struct bidirectional_iterator_tag : public forward_iterator_tag {}; // 전진 후진 모두 가능, 한번에 여러개 읽고 쓰기 가능
+  struct random_access_iterator_tag : public bidirectional_iterator_tag {}; // 반복자를 임의 위치만큼 전진 후진 가능
 
   // standard iterator traits
   template <typename Iter>

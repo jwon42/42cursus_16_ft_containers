@@ -78,6 +78,15 @@ void test_iterators()
     }
 	assert((--smap.end())->first == 1000);
     check("end()", (--map.end())->first == 1000);
+
+	it = --map.end();
+	sit = --smap.end();
+	ft::map<int, int>::reverse_iterator rit = map.rbegin();
+	std::map<int, int>::reverse_iterator srit = smap.rbegin();
+	assert(srit->first == 1000);
+	check("rbegin()", rit->first == 1000);
+	assert((--smap.rend())->first == 1);
+	check("rend()", (--map.rend())->first == 1);
 }
 
 void test_modifiers()

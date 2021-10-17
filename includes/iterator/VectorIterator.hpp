@@ -6,14 +6,14 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/04 14:52:21 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 15:37:31 by jwon             ###   ########.fr       */
+/*   Updated: 2021/10/16 13:41:24 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTORITERATOR_HPP
 # define VECTORITERATOR_HPP
 
-# include "Iterator.hpp"
+# include "IteratorUtils.hpp"
 
 namespace ft
 {
@@ -170,13 +170,12 @@ namespace ft
 			typedef T const & const_reference;
 			typedef T const * const_pointer;
 
-		private:
-			const_reference operator[](size_t)
+		public:
+			const_reference operator[](size_t n)
 			{
-				return (this->m_ptr);
+				return (this->m_ptr[n]);
 			}
 
-		public:
 			const_vector_iterator(pointer ptr = NULL)
 			{
 				this->m_ptr = ptr;

@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/25 15:49:30 by jwon              #+#    #+#             */
-/*   Updated: 2021/09/04 03:29:27 by jwon             ###   ########.fr       */
+/*   Updated: 2021/10/17 20:23:33 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 # include <stddef.h>
 # include <iostream>
 
-# include "Utils.hpp"
-# include "Iterator.hpp"
+# include "../Utils.hpp"
+# include "IteratorUtils.hpp"
 
 namespace ft
 {
@@ -67,7 +67,7 @@ namespace ft
 			~map_iterator()
 			{}
 
-			node_pointer	getNode() const
+			node_pointer	get_node() const
 			{
 				return (m_node);
 			}
@@ -204,7 +204,7 @@ namespace ft
 
 			const_map_iterator(const map_iterator<Key,T,Compare,Node>& rhs)
 			{
-				this->m_node = rhs.getNode();
+				this->m_node = rhs.get_node();
 			}
 
 			const_map_iterator& operator=(const const_map_iterator& rhs)
@@ -276,9 +276,9 @@ namespace ft
 				this->m_base = rhs.m_base;
 			}
 
-			node_pointer	getNode() const
+			node_pointer get_node() const
 			{
-				return (this->m_base.getNode());
+				return (this->m_base.get_node());
 			}
 
 			map_iterator<Key,T,Compare,Node> base() const
@@ -357,7 +357,7 @@ namespace ft
 
 			explicit const_reverse_map_iterator(map_iterator<Key, T, Compare, Node> & rhs)
 			{
-				this->m_base = rhs.getNode();
+				this->m_base = rhs.get_node();
 			}
 
 			const_reverse_map_iterator(node_pointer node = NULL)
@@ -372,12 +372,12 @@ namespace ft
 
 			const_reverse_map_iterator(const_map_iterator<Key,T,Compare,Node> rhs)
 			{
-				this->m_base = rhs.getNode();
+				this->m_base = rhs.get_node();
 			}
 
 			const_reverse_map_iterator(const reverse_map_iterator<Key,T,Compare,Node>& rhs)
 			{
-				this->m_base = rhs.getNode();
+				this->m_base = rhs.get_node();
 			}
 
 			const_reverse_map_iterator& operator=(const const_reverse_map_iterator& rhs)
