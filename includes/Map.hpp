@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/26 15:49:46 by jwon              #+#    #+#             */
-/*   Updated: 2021/10/17 20:18:35 by jwon             ###   ########.fr       */
+/*   Updated: 2021/10/22 20:18:22 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,31 +416,51 @@ namespace ft
 				return (get_height(node->left) - get_height(node->right));
 			}
 
+			/**
+                20(B)                             40(D)
+               /     \		          		         /     \
+            10(A)  40(D)        ------->      20(B)   50(E)
+                  /     \				             /     \      \
+               30(C)   50(E)					    10(A)   30(C)   60(F)
+                           \
+                          60(F)
+                   60(F)이 추가되는 경우 left 회전
+			*/
 			node_ptr left_rotate(node_ptr node)
 			{
-				node_ptr new_parent = node->right;
+				node_ptr new_parent = node->right; // 새 노드 선언 후 D로 초기화
 
-				new_parent->parent = node->parent;
-				node->parent = new_parent;
-				node->right = new_parent->left;
-				if (new_parent->left)
-					new_parent->left->parent = node;
-				new_parent->left = node;
+				new_parent->parent = node->parent; // D의 부모를 B의 부모로 할당 (기준노드 변경작업)
+				node->parent = new_parent; // B의 부모는 D 노드로 변경
+				node->right = new_parent->left; // B의 오른쪽 노드를 D에서 C로 변경
+				if (new_parent->left) // 만약 D에 왼쪽 노드(C)가 있다면?
+					new_parent->left->parent = node; // C의 부모를 D에서 B로 변경
+				new_parent->left = node; // D의 왼쪽 노드는 B
 				set_height(node);
 				set_height(new_parent);
 				return (new_parent);
 			}
 
+			/**
+                50(E)                            30(C)
+               /     \                          /    \
+             30(C)  60(F)      ------->      20(B)   50(E)
+             /    \                          /       /    \
+           20(B)  40(D)                   10(A)   40(D)   60(F)
+           /
+        10(A)
+                   10(A)이 추가되는 경우 right 회전
+			*/
 			node_ptr right_rotate(node_ptr node)
 			{
-				node_ptr new_parent = node->left;
+				node_ptr new_parent = node->left; // 새 노드는 C
 
-				new_parent->parent = node->parent;
-				node->parent = new_parent;
-				node->left = new_parent->right;
-				if (new_parent->right)
-					new_parent->right->parent = node;
-				new_parent->right = node;
+				new_parent->parent = node->parent; // 새 노드 C의 부모를 기존 노드 E의 부모로 할당
+				node->parent = new_parent; // 노드 E의 부모는 새 노드인 C 노드로 변경
+				node->left = new_parent->right; // 노드 E의 왼쪽 노드를 C에서 D로 변경
+				if (new_parent->right) // 만약 노드 C에 오른쪽 노드(D)가 있다면?
+					new_parent->right->parent = node; // 노드 D의 부모를 C에서 E로 변경
+				new_parent->right = node; // 새 노드 C의 오른쪽 노드를 E로 할당
 				set_height(node);
 				set_height(new_parent);
 				return (new_parent);
@@ -495,69 +515,69 @@ namespace ft
 
 			node_ptr insert_node(node_ptr node, node_ptr parent, const value_type& val)
 			{
-				if (node == NULL)
-					return (create_node(val, parent));
-				if (m_compare(val.first, node->val.first))
-					node->left = insert_node(node->left, node, val);
-				else if (m_compare(node->val.first, val.first))
-					node->right = insert_node(node->right, node, val);
+				if (node == NULL) // 아무것도 없는 상태에서 첫 insert면
+					return (create_node(val, parent)); // 노드 생성
+				if (m_compare(val.first, node->val.first)) // value가 node보다 작다면?
+					node->left = insert_node(node->left, node, val); // 왼쪽에 삽입
+				else if (m_compare(node->val.first, val.first)) // value가 node보다 크다면?
+					node->right = insert_node(node->right, node, val); // 오른쪽에 삽입
 				else
-					return (m_last_inserted_node = node);
-				set_height(node);
-				return(rebalance_tree(node));
+					return (m_last_inserted_node = node); // 같으면 map은 삽입 불가, 마지막 삽입 노드에 기록만 하기
+				set_height(node); // 노드 높이 재설정
+				return(rebalance_tree(node)); // 트리 균형 잡기
 			}
 
 			// key를 이용하여 node 찾아서 리턴
 			node_ptr search_tree(node_ptr node, const key_type& key) const
 			{
-				if (node == NULL)
-					return (NULL);
-				if (!m_compare(node->val.first, key) && !m_compare(key, node->val.first))
-					return (node);
-				if (m_compare(key, node->val.first))
-					return (search_tree(node->left, key));
-				else if (m_compare(node->val.first, key))
-					return (search_tree(node->right, key));
-				return (NULL);
+				if (node == NULL) // 노드가 비어있으면
+					return (NULL); // null 반환
+				if (!m_compare(node->val.first, key) && !m_compare(key, node->val.first)) // key보다 왼쪽에 아무것도 없거나, key보다 오른쪽에 아무것도 없으면, 이건 없는 키임
+					return (node); // 그냥 노드 반환
+				if (m_compare(key, node->val.first)) // true면 왼쪽이라는 의미
+					return (search_tree(node->left, key)); // 왼쪽 노드 보내서 재귀
+				else if (m_compare(node->val.first, key)) // true면 오른쪽이라는 의미
+					return (search_tree(node->right, key)); // 오른쪽 노드 보내서 재귀
+				return (NULL); // 끝까지 가도 못찾으면 null
 			}
 
 			// key를 이용하여 node 삭제 후 재정렬
 			node_ptr delete_node(node_ptr node, const key_type& key)
 			{
-				if (node == NULL)
+				if (node == NULL) // 재귀 중단 조건
 					return (NULL);
 
-				if (m_compare(key, node->val.first))
-					node->left = delete_node(node->left, key);
-				else if (m_compare(node->val.first, key))
-					node->right = delete_node(node->right, key);
-				else
+				if (m_compare(key, node->val.first)) // key가 현재 노드보다 왼쪽이면
+					node->left = delete_node(node->left, key); // 왼쪽 노드와 key를 보내서 재귀
+				else if (m_compare(node->val.first, key)) // key가 현재 노드보다 오른쪽이면
+					node->right = delete_node(node->right, key); // 오른쪽 노드와 key를 보내서 재귀
+				else // 찾았다
 				{
-					if ((node->left == NULL) || (node->right == NULL))
+					if ((node->left == NULL) || (node->right == NULL)) // 자식이 하나만 있거나 없는 노드
 					{
-						node_ptr tmp = node->left ? node->left : node->right;
-						if (tmp == NULL)
-							std::swap(tmp, node);
-						else
+						node_ptr tmp = node->left ? node->left : node->right; // 존재하는 자식 트리를 임시 포인터에 할당
+						if (tmp == NULL) // 자식이 없는 경우
+							std::swap(tmp, node); // node에 null 넣기(swap 사용으로 동일하게 이동)
+						else // 자식이 하나 있는 경우
 						{
-							m_alloc.destroy(&node->val);
-							m_alloc.construct(&node->val, tmp->val);
-							node->left = NULL;
-							node->right = NULL;
+							m_alloc.destroy(&node->val); // 메모리 해제
+							m_alloc.construct(&node->val, tmp->val); // null 넣어서 댕글링 방지
+							node->left = NULL; // 자식 노드에 null 할당
+							node->right = NULL; // 자식 노드에 null 할당
 						}
-						m_alloc.destroy(&tmp->val);
-						node_alloc(m_alloc).deallocate(tmp, 1);
-						m_size--;
+						m_alloc.destroy(&tmp->val); // 임시포인터 소멸
+						node_alloc(m_alloc).deallocate(tmp, 1); // 메모리공간 해제
+						m_size--; // map 사이즈 1 축소
 					}
 					else
 					{
-						node_ptr tmp = this->smallest_node(node->right);
-						m_alloc.destroy(&node->val);
-						m_alloc.construct(&node->val, tmp->val);
-						node->right = delete_node(node->right, tmp->val.first);
+						node_ptr tmp = this->smallest_node(node->right); // 오른쪽 자식 노드에서 가장 작은 노드를 임시 포인터에 할당, 삭제 후 뒤를 이을 후계자로 이용
+						m_alloc.destroy(&node->val); // 노드 소멸
+						m_alloc.construct(&node->val, tmp->val); // 임시 포인터를 node에 할당
+						node->right = delete_node(node->right, tmp->val.first); // 오른쪽 노드에 후계자 노드 연결
 					}
 				}
-				return(rebalance_tree(node));
+				return(rebalance_tree(node)); // 균형
 			}
 
 			// 모든 node 삭제
