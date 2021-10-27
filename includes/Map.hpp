@@ -6,7 +6,7 @@
 /*   By: jwon <jwon@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/26 15:49:46 by jwon              #+#    #+#             */
-/*   Updated: 2021/10/23 12:42:09 by jwon             ###   ########.fr       */
+/*   Updated: 2021/10/27 13:44:25 by jwon             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,21 +151,13 @@ namespace ft
 				if (this->empty())
 					return (reverse_iterator(m_root));
 				return (reverse_iterator((this->smallest_node(m_root))->left, this->smallest_node(m_root)));
-				// return (--reverse_iterator(begin().get_node()));
 			}
 
 			const_reverse_iterator rend() const
 			{
 				if (this->empty())
 					return (const_reverse_iterator(m_root));
-				Node *newnode = new Node;
-				Node smallest = this->smallest_node(m_root);
-				newnode->parent = smallest;
-				smallest.left = newnode;
-				return (const_reverse_iterator(newnode, this->smallest_node(m_root)));
-				// if (this->empty())
-				// 	return (const_reverse_iterator(m_root));
-				// return (const_reverse_iterator((this->smallest_node(m_root))->left, this->smallest_node(m_root)));
+				return (const_reverse_iterator((this->smallest_node(m_root))->left, this->smallest_node(m_root)));
 			}
 
 			// capacity
@@ -532,8 +524,8 @@ namespace ft
 			{
 				if (node == NULL) // 노드가 비어있으면
 					return (NULL); // null 반환
-				if (!m_compare(node->val.first, key) && !m_compare(key, node->val.first)) // key보다 왼쪽에 아무것도 없거나, key보다 오른쪽에 아무것도 없으면, 이건 없는 키임
-					return (node); // 그냥 노드 반환
+				if (!m_compare(node->val.first, key) && !m_compare(key, node->val.first)) // 찾았다
+					return (node); // 노드 반환
 				if (m_compare(key, node->val.first)) // true면 왼쪽이라는 의미
 					return (search_tree(node->left, key)); // 왼쪽 노드 보내서 재귀
 				else if (m_compare(node->val.first, key)) // true면 오른쪽이라는 의미
